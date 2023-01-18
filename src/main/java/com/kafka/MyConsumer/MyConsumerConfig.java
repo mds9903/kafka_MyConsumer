@@ -21,12 +21,24 @@ public class MyConsumerConfig {
 
     @Value("${spring.kafka.bootstrap-server}")
     private String bootstrapServer;
+    @Value("${consumer_groupId}")
+    private Object groupId;
 
     public Map<String, Object> myConsumerConfig() {
         Map<String, Object> props = new HashMap<>();
+        // the server to connect with the kafka cluster
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+        // deserializer for keys
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, StringSerializer.class);
+        // deserializer for values
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        // group id configuration
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
+        // auto offset reset
+        // none: if no previous offset is found, don't start consuming
+        // earliest: read from the very beginning
+        // latest: read from now
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         return props;
     }
 
