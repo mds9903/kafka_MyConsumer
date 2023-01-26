@@ -39,6 +39,7 @@ public class MyKafkaListener {
 
                 // convert the data into a itemObject
                 ItemObject pojoItem = getItemObjectFromCSVString(data);
+                logger.info("pojo item: "+pojoItem.toString());
                 if(pojoItem != null){
                     // headers to set the body for json
                     HttpHeaders headers = new HttpHeaders();
@@ -46,8 +47,9 @@ public class MyKafkaListener {
 //
                     // convert pojoItem to a json object for sending in the http request;
                     ObjectMapper mapper = new ObjectMapper();
-                    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+//                    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
                     String jsonStrItem = mapper.writeValueAsString(pojoItem);
+                    logger.info("json string: "+jsonStrItem);
 
                     // pass the json as the request body
                     HttpEntity<String> request = new HttpEntity<String>(jsonStrItem, headers);
