@@ -14,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class MyKafkaListener {
@@ -22,8 +24,23 @@ public class MyKafkaListener {
 
     @KafkaListener(topics = "inventory_app", groupId = "items_consumer")
     void listener(String data) {
-
         logger.info("listener received data:-\n{"+ data + "}\n");
+
+        //  Define regex patterns for each message type (i) and (ii).
+
+        //  regex for item(eg:"Blue Jeans,Apparel,HSN001,test status,100,t,t,t"):--
+        //  ^[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[\d]+([.]?[\d]+),(t|f),(t|f),(t|f)$
+        Pattern itemPattern = Pattern.compile(
+                "^[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[\\d]+([.]?[\\d]+),(t|f),(t|f),(t|f)$");
+
+        //  For each incoming message, apply the regex pattern on it.
+        Matcher matcher = itemPattern.matcher(data.toString());
+
+        if(matcher.find()){
+            logger.info("the message data is for an item");
+        }else {
+            logger.info("the message data is not for an item");
+        }
 //        if(isFormatValid(data)){
 //            try {
 //                // send this data to an external api
