@@ -24,22 +24,36 @@ public class MyKafkaListener {
 
     @KafkaListener(topics = "inventory_app", groupId = "items_consumer")
     void listener(String data) {
-        logger.info("listener received data:-\n{"+ data + "}\n");
+        logger.info("Data received: {" + data + "}");
 
         //  Define regex patterns for each message type (i) and (ii).
 
-        //  regex for item(eg:"Blue Jeans,Apparel,HSN001,test status,100,t,t,t"):--
-        //  ^[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[0-9A-Za-z\s]+,[\d]+([.]?[\d]+),(t|f),(t|f),(t|f)$
-        Pattern itemPattern = Pattern.compile(
-                "^[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[0-9A-Za-z\\s]+,[\\d]+([.]?[\\d]+),(t|f),(t|f),(t|f)$");
-
+        //  regex for item(eg:"Blue Jeans,Apparel,HSN001,test status,100,t,t,t")
+        Pattern itemPattern = Pattern.compile("^[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d]+[.]?[\\d]+,(true|t|false|f),(true|t|false|f),(true|t|false|f)$");
+        //  regex for location (eg:
+        //  "Reliance & Co.,
+        //  Inventory Hub,
+        //  false,
+        //  true,
+        //  false,
+        //  addr line 1,
+        //  addr line 2,
+        //  addr line 3,
+        //  Kolkata,
+        //  West Bengal,
+        //  India,
+        //  700001")
+        Pattern locationPattern = Pattern.compile(
+                "^[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,(t|true|f|false),(t|true|f|false),(t|true|f|false),[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+$");
         //  For each incoming message, apply the regex pattern on it.
-        Matcher matcher = itemPattern.matcher(data.toString());
+//        Matcher matcherLocation = locationPattern.matcher(data);
 
-        if(matcher.find()){
-            logger.info("the message data is for an item");
-        }else {
-            logger.info("the message data is not for an item");
+        if (itemPattern.matcher(data).find()) {
+            logger.info("\n\tthe message data is for an item");
+        } else if (locationPattern.matcher(data).find()) {
+            logger.info("\n\tthe message data is for a location");
+        } else {
+            logger.info("the message data is of unknown type");
         }
 //        if(isFormatValid(data)){
 //            try {
@@ -85,10 +99,10 @@ public class MyKafkaListener {
 
     private ItemObject getItemObjectFromCSVString(String data) {
         List<String> elements = Arrays.stream(data.split(",")).toList();
-        logger.info("getItemObjectFromCSVString: elements:-\n"+elements);
+        logger.info("getItemObjectFromCSVString: elements:-\n" + elements);
 //        return null;
         int i = 0;
-        try{
+        try {
             Long itemId = Long.valueOf(elements.get(i++));
             String itemDesc = elements.get(i++);
             String category = elements.get(i++);
@@ -98,17 +112,8 @@ public class MyKafkaListener {
             Boolean pickupAllowed = Boolean.valueOf(elements.get(i++));
             Boolean shippingAllowed = Boolean.valueOf(elements.get(i++));
             Boolean deliveryAllowed = Boolean.valueOf(elements.get(i++));
-            return new ItemObject(
-                    itemId,
-                    itemDesc,
-                    category,
-                    itemType,
-                    status,
-                    price,
-                    pickupAllowed,
-                    shippingAllowed,
-                    deliveryAllowed);
-        }catch (Exception e){
+            return new ItemObject(itemId, itemDesc, category, itemType, status, price, pickupAllowed, shippingAllowed, deliveryAllowed);
+        } catch (Exception e) {
             return null;
         }
     }
