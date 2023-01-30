@@ -2,8 +2,7 @@ package com.kafka.MyConsumer;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.apache.tomcat.util.json.JSONParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
@@ -21,52 +20,50 @@ public class MyKafkaListener {
     private static final String uri = "http://localhost:8088/inventory/items/noValidate";
     Logger logger = LoggerFactory.getLogger(MyKafkaListener.class);
 
-    @KafkaListener(topics = "items", groupId = "items_consumer")
+    @KafkaListener(topics = "inventory_app", groupId = "items_consumer")
     void listener(String data) {
 
         logger.info("listener received data:-\n{"+ data + "}\n");
-        logger.info("validating data received");
-
-        if(isFormatValid(data)){
-            try {
-                // send this data to an external api
-                logger.info("Sending data to api");
-
-                // set up the api call
-
-                // a rest template to perform http calls
-                RestTemplate restTemplate = new RestTemplate();
-
-                // convert the data into a itemObject
-                ItemObject pojoItem = getItemObjectFromCSVString(data);
-                logger.info("pojo item: "+pojoItem.toString());
-                if(pojoItem != null){
-                    // headers to set the body for json
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.setContentType(MediaType.APPLICATION_JSON);
+//        if(isFormatValid(data)){
+//            try {
+//                // send this data to an external api
+//                logger.info("Sending data to api");
 //
-                    // convert pojoItem to a json object for sending in the http request;
-                    ObjectMapper mapper = new ObjectMapper();
-//                    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-                    String jsonStrItem = mapper.writeValueAsString(pojoItem);
-                    logger.info("json string: "+jsonStrItem);
-
-                    // pass the json as the request body
-                    HttpEntity<String> request = new HttpEntity<String>(jsonStrItem, headers);
-
-//                    HttpEntity<String> request = new HttpEntity<String>(pojoItem.toString(), headers);
-
-                    // response of the rest api call
-                    String response = restTemplate.postForObject(uri, request, String.class);
-                    logger.info("Response: " + response);
-
-                }else{
-                    throw new Exception("Error parsing csv data to pojoItem");
-                }
-            } catch (Exception e) {
-                logger.error("Exception Occurred: " + e);
-            }
-        }
+//                // set up the api call
+//
+//                // a rest template to perform http calls
+//                RestTemplate restTemplate = new RestTemplate();
+//
+//                // convert the data into a itemObject
+//                ItemObject pojoItem = getItemObjectFromCSVString(data);
+//                if(pojoItem != null){
+//                    logger.info("pojo item: "+pojoItem.toString());
+//                    // headers to set the body for json
+//                    HttpHeaders headers = new HttpHeaders();
+//                    headers.setContentType(MediaType.APPLICATION_JSON);
+////
+//                    // convert pojoItem to a json object for sending in the http request;
+//                    ObjectMapper mapper = new ObjectMapper();
+////                    mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+//                    String jsonStrItem = mapper.writeValueAsString(pojoItem);
+//                    logger.info("json string: "+jsonStrItem);
+//
+//                    // pass the json as the request body
+//                    HttpEntity<String> request = new HttpEntity<String>(jsonStrItem, headers);
+//
+////                    HttpEntity<String> request = new HttpEntity<String>(pojoItem.toString(), headers);
+//
+//                    // response of the rest api call
+//                    String response = restTemplate.postForObject(uri, request, String.class);
+//                    logger.info("Response: " + response);
+//
+//                }else{
+//                    throw new Exception("Error parsing csv data to pojoItem");
+//                }
+//            } catch (Exception e) {
+//                logger.error("Exception Occurred: " + e);
+//            }
+//        }
     }
 
     private ItemObject getItemObjectFromCSVString(String data) {
