@@ -1,20 +1,12 @@
 package com.kafka.MyConsumer;
 
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
@@ -26,8 +18,8 @@ public class MyKafkaListener {
     void listener(String data) {
         logger.info("Data received: {" + data + "}");
 
-        //  Define regex patterns for each message type (i) and (ii).
 
+        //  Define regex patterns for each message type (i) and (ii).
         //  regex for item(eg:"Blue Jeans,Apparel,HSN001,test status,100,t,t,t")
         Pattern itemPattern = Pattern.compile("^[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d]+[.]?[\\d]+,(true|t|false|f),(true|t|false|f),(true|t|false|f)$");
         //  regex for location (eg:
@@ -43,10 +35,9 @@ public class MyKafkaListener {
         //  West Bengal,
         //  India,
         //  700001")
-        Pattern locationPattern = Pattern.compile(
-                "^[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,(t|true|f|false),(t|true|f|false),(t|true|f|false),[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+$");
+        Pattern locationPattern = Pattern.compile("^[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,(t|true|f|false),(t|true|f|false),(t|true|f|false),[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+,[\\d\\w\\s\\&\\.]+$");
         //  For each incoming message, apply the regex pattern on it.
-//        Matcher matcherLocation = locationPattern.matcher(data);
+//  Matcher matcherLocation = locationPattern.matcher(data);
 
         if (itemPattern.matcher(data).find()) {
             logger.info("\n\tthe message data is for an item");
